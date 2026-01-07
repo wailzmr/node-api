@@ -23,6 +23,21 @@ db.serialize(() => {
   )`);
 
   db.run(`CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id)`);
+
+  // Seed initial users if empty
+  db.get('SELECT COUNT(*) AS count FROM users', (err, row) => {
+    if (err) return; // silently skip on error
+    if (row && row.count === 0) {
+      const users = [
+        ['Alice', 'alice@example.com', 25],
+        ['Bob', 'bob@example.com', 30],
+        ['Carol', 'carol@example.com', 28],
+      ];
+      const stmt = db.prepare('INSERT INTO users (name, email, age) VALUES (?, ?, ?)');
+      for (const u of users) stmt.run(...u);
+      stmt.finalize();
+    }
+  });
 });
 
 const run = (sql, params = []) =>
