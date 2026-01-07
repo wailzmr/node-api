@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Node API Endpoints</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; line-height: 1.6; }
+    code { background: #f4f4f4; padding: 2px 4px; border-radius: 4px; }
+    h1, h2 { margin-top: 1.5rem; }
+    ul { padding-left: 1.2rem; }
+  </style>
+</head>
+<body>
+  <h1>API Documentatie</h1>
+  <p>Deze API is gebouwd met Node.js, Express en SQLite. Hieronder vind je alle endpoints en parameters.</p>
+
+  <h2>Users</h2>
+  <ul>
+    <li><strong>GET</strong> <code>/users</code> – lijst alle users.
+      <ul>
+        <li>Query: <code>limit</code> (int), <code>offset</code> (int), <code>search</code> (string; zoekt in <em>name</em> en <em>email</em>).</li>
+        <li>Voorbeeld: <code>/users?limit=10&amp;offset=0&amp;search=john</code></li>
+      </ul>
+    </li>
+    <li><strong>GET</strong> <code>/users/:id</code> – details van één user.</li>
+    <li><strong>POST</strong> <code>/users</code> – maak een user aan.
+      <ul>
+        <li>Body (JSON): <code>{ name, email, age }</code></li>
+        <li>Validatie: velden mogen niet leeg zijn; <em>age</em> is een geheel getal ≥ 0; <em>name</em> bevat geen cijfers; <em>email</em> is geldig en uniek.</li>
+      </ul>
+    </li>
+    <li><strong>PUT</strong> <code>/users/:id</code> – update een user (zelfde validatie als POST).</li>
+    <li><strong>DELETE</strong> <code>/users/:id</code> – verwijder een user.</li>
+  </ul>
+
+  <h2>Posts</h2>
+  <ul>
+    <li><strong>GET</strong> <code>/posts</code> – lijst alle posts.
+      <ul>
+        <li>Query: <code>limit</code> (int), <code>offset</code> (int), <code>search</code> (string; zoekt in <em>title</em>).</li>
+        <li>Voorbeeld: <code>/posts?limit=5&amp;offset=0&amp;search=api</code></li>
+      </ul>
+    </li>
+    <li><strong>GET</strong> <code>/posts/:id</code> – details van één post.</li>
+    <li><strong>POST</strong> <code>/posts</code> – maak een post aan.
+      <ul>
+        <li>Body (JSON): <code>{ title, content, user_id }</code></li>
+        <li>Validatie: velden mogen niet leeg zijn; <em>user_id</em> is een geheel getal en verwijst naar een bestaande user.</li>
+      </ul>
+    </li>
+    <li><strong>PUT</strong> <code>/posts/:id</code> – update een post (zelfde validatie als POST).</li>
+    <li><strong>DELETE</strong> <code>/posts/:id</code> – verwijder een post.</li>
+  </ul>
+
+  <h2>Technisch</h2>
+  <ul>
+    <li>HTTP-verbs: GET, POST, PUT, DELETE.</li>
+    <li>Content-type: <code>application/json</code> voor alle write-acties.</li>
+    <li>Database: SQLite-bestand <code>database.sqlite</code> wordt automatisch aangemaakt.</li>
+  </ul>
+
+  <p>Server draait standaard op <code>http://localhost:3000</code>.</p>
+</body>
+</html>
