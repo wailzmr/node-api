@@ -38,6 +38,39 @@ db.serialize(() => {
       stmt.finalize();
     }
   });
+
+  // Seed initial posts if empty (uses existing users)
+  db.get('SELECT COUNT(*) AS count FROM posts', (err, row) => {
+    if (err) return; // silently skip on error
+    if (row && row.count === 0) {
+      db.all('SELECT id FROM users ORDER BY id LIMIT 3', (uErr, users) => {
+        if (uErr) return;
+        const ids = (users || []).map(u => u.id);
+
+        const ensureUserId = (cb) => {
+          if (ids.length > 0) return cb(ids);
+          db.run('INSERT INTO users (name, email, age) VALUES (?, ?, ?)', ['Demo', 'demo@example.com', 20], function (iErr) {
+            if (iErr) return;
+            cb([this.lastID]);
+          });
+        };
+
+        ensureUserId((useIds) => {
+          const stmt = db.prepare('INSERT INTO posts (title, content, user_id) VALUES (?, ?, ?)');
+          const u0 = useIds[0];
+          const u1 = useIds[1] ?? u0;
+          const u2 = useIds[2] ?? u0;
+          const posts = [
+            ['Welkom bij de API', 'Deze post legt kort uit hoe je de API gebruikt.', u0],
+            ['Tweede post', 'Nog wat content om de lijst te vullen.', u1],
+            ['API Tips', 'Gebruik /users en /posts met limit & offset.', u2],
+          ];
+          for (const p of posts) stmt.run(...p);
+          stmt.finalize();
+        });
+      });
+    }
+  });
 });
 
 const run = (sql, params = []) =>
