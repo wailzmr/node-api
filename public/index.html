@@ -5,61 +5,378 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Node API Endpoints</title>
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; line-height: 1.6; }
-    code { background: #f4f4f4; padding: 2px 4px; border-radius: 4px; }
-    h1, h2 { margin-top: 1.5rem; }
-    ul { padding-left: 1.2rem; }
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #020617;
+      --card-bg: #0b1220;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.85);
+      --radius-lg: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.18), transparent 55%),
+        linear-gradient(135deg, var(--bg-soft), var(--bg));
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 3rem 1rem;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1024px;
+      background: radial-gradient(circle at top, rgba(148, 163, 184, 0.16), transparent 60%) var(--card-bg);
+      border-radius: 24px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: var(--shadow-soft);
+      padding: 2.5rem 2.25rem 2.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.14), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .shell-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+
+    .title-block h1 {
+      margin: 0 0 0.35rem;
+      font-size: clamp(1.9rem, 3vw, 2.3rem);
+      letter-spacing: -0.04em;
+    }
+
+    .title-block p {
+      margin: 0;
+      color: var(--text-muted);
+      max-width: 38rem;
+    }
+
+    .badge-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.4));
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      backdrop-filter: blur(10px);
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #f9fafb, #22c55e);
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25);
+    }
+
+    .badge-pill {
+      border-color: rgba(56, 189, 248, 0.6);
+      color: #e0f2fe;
+      background: linear-gradient(135deg, rgba(8, 47, 73, 0.9), rgba(12, 74, 110, 0.8));
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+      gap: 1.75rem;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 1.75rem 1rem;
+      }
+
+      .shell {
+        padding: 1.75rem 1.4rem 1.6rem;
+      }
+
+      main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    section {
+      margin-bottom: 1.4rem;
+    }
+
+    h2 {
+      margin: 0 0 0.6rem;
+      font-size: 1.05rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.13), transparent 55%) var(--card-bg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      padding: 1.3rem 1.4rem;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.7);
+    }
+
+    .card-soft {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.9));
+    }
+
+    p {
+      margin-top: 0.15rem;
+      margin-bottom: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    ul {
+      padding-left: 1.2rem;
+      margin: 0.35rem 0;
+      color: var(--text-main);
+    }
+
+    li + li {
+      margin-top: 0.4rem;
+    }
+
+    .endpoint-list > li {
+      margin-top: 0.55rem;
+      padding: 0.55rem 0.55rem 0.55rem 0.75rem;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(30, 64, 175, 0.6);
+    }
+
+    .endpoint-list code {
+      font-size: 0.9rem;
+    }
+
+    strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    code {
+      background: rgba(15, 23, 42, 0.9);
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.85rem;
+      color: #e0f2fe;
+    }
+
+    em {
+      color: #c4b5fd;
+      font-style: normal;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.7rem;
+    }
+
+    .meta-item {
+      padding: 0.6rem 0.7rem;
+      border-radius: 0.9rem;
+      border: 1px dashed rgba(148, 163, 184, 0.7);
+      background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.15), transparent 55%);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .meta-label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(148, 163, 184, 0.9);
+      margin-bottom: 0.25rem;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin: 0.2rem 0 0;
+    }
+
+    .pill {
+      padding: 0.1rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      font-size: 0.75rem;
+      color: var(--text-main);
+      background: rgba(15, 23, 42, 0.75);
+    }
+
+    footer {
+      margin-top: 1.4rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .dot-inline {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.35);
+      margin-right: 0.35rem;
+    }
   </style>
 </head>
 <body>
-  <h1>API Documentatie</h1>
-  <p>Deze API is gebouwd met Node.js, Express en SQLite. Hieronder vind je alle endpoints en parameters.</p>
+  <div class="shell">
+    <div class="shell-inner">
+      <header>
+        <div class="title-block">
+          <h1>API Documentatie</h1>
+          <p>Deze API is gebouwd met Node.js, Express en SQLite. Hieronder vind je alle endpoints en parameters.</p>
+        </div>
+        <div class="badge-group" aria-label="API kenmerken">
+          <div class="badge">
+            <span class="badge-dot" aria-hidden="true"></span>
+            <span>Server actief op <code>localhost:3000</code></span>
+          </div>
+          <div class="badge badge-pill">
+            REST API · JSON · SQLite
+          </div>
+        </div>
+      </header>
 
-  <h2>Users</h2>
-  <ul>
-    <li><strong>GET</strong> <code>/users</code> – lijst alle users.
-      <ul>
-        <li>Query: <code>limit</code> (int), <code>offset</code> (int), <code>search</code> (string; zoekt in <em>name</em> en <em>email</em>).</li>
-        <li>Voorbeeld: <code>/users?limit=10&amp;offset=0&amp;search=john</code></li>
-      </ul>
-    </li>
-    <li><strong>GET</strong> <code>/users/:id</code> – details van één user.</li>
-    <li><strong>POST</strong> <code>/users</code> – maak een user aan.
-      <ul>
-        <li>Body (JSON): <code>{ name, email, age }</code></li>
-        <li>Validatie: velden mogen niet leeg zijn; <em>age</em> is een geheel getal ≥ 0; <em>name</em> bevat geen cijfers; <em>email</em> is geldig en uniek.</li>
-      </ul>
-    </li>
-    <li><strong>PUT</strong> <code>/users/:id</code> – update een user (zelfde validatie als POST).</li>
-    <li><strong>DELETE</strong> <code>/users/:id</code> – verwijder een user.</li>
-  </ul>
+      <main>
+        <div>
+          <section class="card">
+            <h2>Users endpoints</h2>
+            <ul class="endpoint-list">
+              <li><strong>GET</strong> <code>/users</code> – lijst alle users.
+                <ul>
+                  <li>Query: <code>limit</code> (int), <code>offset</code> (int), <code>search</code> (string; zoekt in <em>name</em> en <em>email</em>).</li>
+                  <li>Voorbeeld: <code>/users?limit=10&amp;offset=0&amp;search=john</code></li>
+                </ul>
+              </li>
+              <li><strong>GET</strong> <code>/users/:id</code> – details van één user.</li>
+              <li><strong>POST</strong> <code>/users</code> – maak een user aan.
+                <ul>
+                  <li>Body (JSON): <code>{ name, email, age }</code></li>
+                  <li>Validatie: velden mogen niet leeg zijn; <em>age</em> is een geheel getal ≥ 0; <em>name</em> bevat geen cijfers; <em>email</em> is geldig en uniek.</li>
+                </ul>
+              </li>
+              <li><strong>PUT</strong> <code>/users/:id</code> – update een user (zelfde validatie als POST).</li>
+              <li><strong>DELETE</strong> <code>/users/:id</code> – verwijder een user.</li>
+            </ul>
+          </section>
 
-  <h2>Posts</h2>
-  <ul>
-    <li><strong>GET</strong> <code>/posts</code> – lijst alle posts.
-      <ul>
-        <li>Query: <code>limit</code> (int), <code>offset</code> (int), <code>search</code> (string; zoekt in <em>title</em>).</li>
-        <li>Voorbeeld: <code>/posts?limit=5&amp;offset=0&amp;search=api</code></li>
-      </ul>
-    </li>
-    <li><strong>GET</strong> <code>/posts/:id</code> – details van één post.</li>
-    <li><strong>POST</strong> <code>/posts</code> – maak een post aan.
-      <ul>
-        <li>Body (JSON): <code>{ title, content, user_id }</code></li>
-        <li>Validatie: velden mogen niet leeg zijn; <em>user_id</em> is een geheel getal en verwijst naar een bestaande user.</li>
-      </ul>
-    </li>
-    <li><strong>PUT</strong> <code>/posts/:id</code> – update een post (zelfde validatie als POST).</li>
-    <li><strong>DELETE</strong> <code>/posts/:id</code> – verwijder een post.</li>
-  </ul>
+          <section class="card card-soft">
+            <h2>Posts endpoints</h2>
+            <ul class="endpoint-list">
+              <li><strong>GET</strong> <code>/posts</code> – lijst alle posts.
+                <ul>
+                  <li>Query: <code>limit</code> (int), <code>offset</code> (int), <code>search</code> (string; zoekt in <em>title</em>).</li>
+                  <li>Voorbeeld: <code>/posts?limit=5&amp;offset=0&amp;search=api</code></li>
+                </ul>
+              </li>
+              <li><strong>GET</strong> <code>/posts/:id</code> – details van één post.</li>
+              <li><strong>POST</strong> <code>/posts</code> – maak een post aan.
+                <ul>
+                  <li>Body (JSON): <code>{ title, content, user_id }</code></li>
+                  <li>Validatie: velden mogen niet leeg zijn; <em>user_id</em> is een geheel getal en verwijst naar een bestaande user.</li>
+                </ul>
+              </li>
+              <li><strong>PUT</strong> <code>/posts/:id</code> – update een post (zelfde validatie als POST).</li>
+              <li><strong>DELETE</strong> <code>/posts/:id</code> – verwijder een post.</li>
+            </ul>
+          </section>
+        </div>
 
-  <h2>Technisch</h2>
-  <ul>
-    <li>HTTP-verbs: GET, POST, PUT, DELETE.</li>
-    <li>Content-type: <code>application/json</code> voor alle write-acties.</li>
-    <li>Database: SQLite-bestand <code>database.sqlite</code> wordt automatisch aangemaakt.</li>
-  </ul>
+        <aside>
+          <section class="card">
+            <h2>Technische details</h2>
+            <p>Belangrijke informatie om de API correct te gebruiken.</p>
+            <ul>
+              <li>HTTP-verbs: GET, POST, PUT, DELETE.</li>
+              <li>Content-type: <code>application/json</code> voor alle write-acties.</li>
+              <li>Database: SQLite-bestand <code>database.sqlite</code> wordt automatisch aangemaakt.</li>
+            </ul>
 
-  <p>Server draait standaard op <code>http://localhost:3000</code>.</p>
+            <div class="meta-grid" aria-label="Snelle referentie">
+              <div class="meta-item">
+                <span class="meta-label">Authenticatie</span>
+                <span>N.v.t. (demo API)</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Formaat</span>
+                <span>Alle responses in JSON</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Resources</span>
+                <div class="pill-row">
+                  <span class="pill">/users</span>
+                  <span class="pill">/posts</span>
+                </div>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Status</span>
+                <span><span class="dot-inline" aria-hidden="true"></span>Lokale ontwikkeling</span>
+              </div>
+            </div>
+          </section>
+
+          <footer>
+            <span>Server draait standaard op <code>http://localhost:3000</code>.</span>
+            <span>Tip: Gebruik tools als Postman of curl om endpoints te testen.</span>
+          </footer>
+        </aside>
+      </main>
+    </div>
+  </div>
 </body>
 </html>
